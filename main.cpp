@@ -38,8 +38,8 @@ void insertWord(Trie* trie, char *word, char *description){
         }   
         curr = curr->next[word[i] - 'A'];
     }
-    curr->end = true;
     strcpy(curr->description, description);
+    curr->end = true;
     system("cls");
     printf("Word %s inputed in the dictionary!\n", word);
     puts("Enter to continue...");
@@ -79,11 +79,15 @@ void printWord(Data* curr, char *word, int depth){
     if(curr->end){
         printf("|%d. %s\t\t\t\t|\n", counter,word);
     }
-    for(int i=0; i<52; i++){
-        if(curr->next[i]){
+    for (int i = 0; i < 52; i++) {
+        if (curr->next[i] == NULL) continue;
+
+        if (i < 26) {
             word[depth] = 'A' + i;
-            printWord(curr->next[i], word, depth + 1);
+        } else {
+            word[depth] = 'a' + (i - 26);
         }
+        printWord(curr->next[i], word, depth + 1);
     }
 }
 
@@ -164,6 +168,7 @@ void searchRelatedWord(Trie* trie, char *prefix){
     printf("  \\__ \\/ _ \\/ __ `/ ___/ ___/ __ \\   / /_/ / _ \\/ / __ `/ __/ _ \\/ __  / \n");
     printf(" ___/ /  __/ /_/ / /  / /__/ / / /  / _, _/  __/ / /_/ / /_/  __/ /_/ /  \n");
     printf("/____/\\___/\\__,_/_/   \\___/_/ /_/  /_/ |_|\\___/_/\\__,_/\\__/\\___/\\__,_/   \n");
+    printf("\n");
     do{
         printf("Input a prefix to be searched[no spaces]: ");
         scanf("%[^\n]", prefix);
@@ -194,13 +199,14 @@ int main(){
         printf(" / /_/ / /_/ / /_/ / /_/ / /  __/\n");
         printf("/_____/\\____/\\____/\\__, /_/\\___/ \n");
         printf("                  /____/         \n");
+        printf("\n");
         printf("1. Release a new slang word\n");
         printf("2. Search a slang word\n");
         printf("3. View all slang words starting with a certain prefix word\n");
         printf("4. View all slang words\n");
         printf("5. Exit\n");
         printf(">> ");
-        input = getch();
+        scanf("%c", &input);
         getchar();
         switch (input){
         case '1':
@@ -225,7 +231,7 @@ int main(){
             break;
         }
 
-    }while(input != 5);
+    }while(input != '5');
 
     return 0;
 }
