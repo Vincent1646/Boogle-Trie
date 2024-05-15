@@ -29,14 +29,22 @@ Data* createData(){
     return newData;
 }
 
+int findIndex(char a){
+    if(a >= 'A' && a <= 'Z')
+        return a - 'A';
+    if(a >= 'a' && a <= 'z')
+        return a - 'a';
+    return -1;
+}
+
 void insertWord(Trie* trie, char *word, char *description){
     Data* curr = trie->root;
     for(int i=0; i<strlen(word); i++){
-        if(curr->next[word[i] - 'A'] == NULL){
-            curr->next[word[i] - 'A'] = createData();
-            curr->next[word[i] - 'A']->prev;
-        }   
-        curr = curr->next[word[i] - 'A'];
+        int index = findIndex(word[i]);
+        if(index == -1) continue;
+        if(curr->next[index] == NULL)
+            curr->next[index] = createData();
+        curr = curr->next[index];
     }
     strcpy(curr->description, description);
     curr->end = true;
@@ -44,20 +52,20 @@ void insertWord(Trie* trie, char *word, char *description){
     printf("Word %s inputed in the dictionary!\n", word);
     puts("Enter to continue...");
     getch();
-    return;
 }
 
 void searcSinglehWord(Trie* trie, char *word){
     Data* curr = trie->root;
     for(int i=0; i<strlen(word); i++){
-        if(curr->next[word[i] - 'A'] == NULL){
+        int index = findIndex(word[i]);
+        if(curr->next[index] == NULL){
             system("cls");
             printf("There is no word %s in the dictionary!\n", word);
             puts("Enter to continue...");
             getch();
             return;
         }
-        curr = curr->next[word[i] - 'A'];
+        curr = curr->next[index];
     }
     if(curr->end){
         system("cls");
@@ -81,7 +89,6 @@ void printWord(Data* curr, char *word, int depth){
     }
     for (int i = 0; i < 52; i++) {
         if (curr->next[i] == NULL) continue;
-
         if (i < 26) {
             word[depth] = 'A' + i;
         } else {
@@ -94,11 +101,14 @@ void printWord(Data* curr, char *word, int depth){
 void searchRelated(Trie* trie, char *prefix){
     Data* curr = trie->root;
     for(int i=0; i<strlen(prefix); i++){
-        if(curr->next[prefix[i] - 'A'] == NULL){
+        int index = findIndex(prefix[i]);
+        if(index == -1) continue;
+        if(curr->next[index] == NULL){
             return;
         }
-        curr = curr->next[prefix[i] - 'A'];
+        curr = curr->next[index];
     }
+    printf("Slang words starting with prefix '%s':\n", prefix);
     printWord(curr, prefix, strlen(prefix));
 }
 
@@ -123,7 +133,9 @@ bool isDescriptionValid(char word[]){
 }
 
 //Menu
-void inputNewSlang(Trie* trie, char *word, char *description){
+void inputNewSlang(Trie* trie){
+    char word[100];
+    char description[100];
     system("cls");
     printf("    ____                     __     \n");
     printf("   /  _/___  ________  _____/ /_    \n");
@@ -133,7 +145,7 @@ void inputNewSlang(Trie* trie, char *word, char *description){
     printf("                                    \n");
     do{
         printf("Input a new slang word [Must be more than 1 characters and contains no space]: ");
-        scanf("%[^\n]", word);
+        scanf("%s", word);
         getchar();
     }while(!isNoSpaces(word) && !isLengthValid(word));
 
@@ -145,7 +157,8 @@ void inputNewSlang(Trie* trie, char *word, char *description){
     insertWord(trie, word, description);
 }
 
-void searchSlangWord(Trie* trie, char *word){
+void searchSlangWord(Trie* trie){
+    char word[100];
     system("cls");
     printf("   _____                      __       \n");
     printf("  / ___/___  ____ ___________/ /_      \n");
@@ -155,13 +168,14 @@ void searchSlangWord(Trie* trie, char *word){
     printf("                                       \n");
     do{
         printf("Input a slang word to be searched[Must be more than 1 characters and contains no space]: ");
-        scanf("%[^\n]", word);
+        scanf("%s", word);
         getchar();
     }while(!isNoSpaces(word) && !isLengthValid(word));
     searcSinglehWord(trie, word);
 }
 
-void searchRelatedWord(Trie* trie, char *prefix){
+void searchRelatedWord(Trie* trie){
+    char prefix[100];
     system("cls");
     printf("   _____                      __       ____       __      __           __\n");
     printf("  / ___/___  ____ ___________/ /_     / __ \\___  / /___ _/ /____  ____/ /\n");
@@ -171,24 +185,31 @@ void searchRelatedWord(Trie* trie, char *prefix){
     printf("\n");
     do{
         printf("Input a prefix to be searched[no spaces]: ");
-        scanf("%[^\n]", prefix);
+        scanf("%s", prefix);
         getchar();
     }while(!isNoSpaces(prefix));
     searchRelated(trie, prefix);
 }
 
-void seeAllWord(Data* curr, char *word, int depth){
-    system("cls");
-    printf("List of all slang words in dictionary:\n");
-    printWord(curr, word, 0);
+void seeAllWord(Data* curr, char *word, int depth) {
+    if (!curr) return;
+    
+    if (curr->end) {
+        word[depth] = '\0'; // Null-terminate the word
+        printf("Slang word: %s\t\t\tDescription: %s\n", word, curr->description);
+    }
+    
+    for (int i = 0; i < 52; i++) {
+        if (curr->next[i] != NULL) {
+            word[depth] = (i < 26) ? ('A' + i) : ('a' + (i - 26));
+            seeAllWord(curr->next[i], word, depth + 1);
+        }
+    }
 }
 
 int main(){
     Trie boogle;
     boogle.root = createData();
-
-    char word[100];
-    char description[256];
     char input;
 
     do{
@@ -210,15 +231,15 @@ int main(){
         getchar();
         switch (input){
         case '1':
-            inputNewSlang(&boogle, word, description);
+            inputNewSlang(&boogle);
             break;
 
         case '2':
-            searchSlangWord(&boogle, word);
+            searchSlangWord(&boogle);
             break;
 
         case '3':
-            searchRelatedWord(&boogle, word);
+            searchRelatedWord(&boogle);
             break;
 
         case '4':
