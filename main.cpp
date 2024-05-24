@@ -86,6 +86,7 @@ void printWord(Data* curr, char *word, int depth){
     if(!curr) return;
     if(curr->end){
         printf("|%d. %s\t\t\t\t|\n", counter,word);
+        counter++;
     }
     for (int i = 0; i < 52; i++) {
         if (curr->next[i] == NULL) continue;
@@ -105,7 +106,7 @@ void searchRelated(Trie* trie, char *prefix) {
         if (index == -1) continue;
         if (curr->next[index] == NULL) {
             system("cls");
-            printf("No words found with the prefix '%s'\n", prefix);
+            printf("There is no prefix '%s' in the dictionary\n", prefix);
             puts("Enter to continue...");
             getch();
             return;
@@ -113,7 +114,7 @@ void searchRelated(Trie* trie, char *prefix) {
         curr = curr->next[index];
     }
     system("cls");
-    printf("Slang words starting with prefix '%s':\n", prefix);
+    printf("word started with '%s':\n", prefix);
     char buffer[256];
     strcpy(buffer, prefix);
     printWord(curr, buffer, strlen(prefix));
@@ -204,7 +205,7 @@ void seeAllWord(Data* curr, char *word, int depth) {
     if (!curr) return;
     
     if (curr->end) {
-        word[depth] = '\0'; // Null-terminate the word
+        word[depth] = '\0'; 
         printf("Slang word: %s\t\t\tDescription: %s\n", word, curr->description);
     }
     
@@ -218,7 +219,7 @@ void seeAllWord(Data* curr, char *word, int depth) {
 
 void viewAllWords(Trie* trie) {
     system("cls");
-    printf("Viewing all slang words:\n");
+    printf("List of all slang words in the dictionary:\n");
     char buffer[256];
     seeAllWord(trie->root, buffer, 0);
     puts("Enter to continue...");
