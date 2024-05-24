@@ -82,8 +82,9 @@ void searcSinglehWord(Trie* trie, char *word){
 
 void printWord(Data* curr, char *word, int depth, int *counter){
     if(!curr) return;
+    word[depth] = '\0';
     if(curr->end){
-        printf("|%d. %s\t\t\t\t|\n", *counter, word);
+        printf("|%d. %s\n", *counter, word);
         (*counter)++;
     }
     for (int i = 0; i < 52; i++) {
