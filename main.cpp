@@ -33,7 +33,7 @@ int findIndex(char a){
     if(a >= 'A' && a <= 'Z')
         return a - 'A';
     if(a >= 'a' && a <= 'z')
-        return a - 'a';
+        return a - 'a' + 26;
     return -1;
 }
 
@@ -98,18 +98,27 @@ void printWord(Data* curr, char *word, int depth){
     }
 }
 
-void searchRelated(Trie* trie, char *prefix){
-    Data* curr = trie->root;
-    for(int i=0; i<strlen(prefix); i++){
+void searchRelated(Trie* trie, char *prefix) {
+    struct Data* curr = trie->root;
+    for (int i = 0; i < strlen(prefix); i++) {
         int index = findIndex(prefix[i]);
-        if(index == -1) continue;
-        if(curr->next[index] == NULL){
+        if (index == -1) continue;
+        if (curr->next[index] == NULL) {
+            system("cls");
+            printf("No words found with the prefix '%s'\n", prefix);
+            puts("Enter to continue...");
+            getch();
             return;
         }
         curr = curr->next[index];
     }
+    system("cls");
     printf("Slang words starting with prefix '%s':\n", prefix);
-    printWord(curr, prefix, strlen(prefix));
+    char buffer[256];
+    strcpy(buffer, prefix);
+    printWord(curr, buffer, strlen(prefix));
+    puts("Enter to continue...");
+    getch();
 }
 
 //Validation
@@ -174,7 +183,7 @@ void searchSlangWord(Trie* trie){
     searcSinglehWord(trie, word);
 }
 
-void searchRelatedWord(Trie* trie){
+void searchRelatedWord(Trie* trie) {
     char prefix[100];
     system("cls");
     printf("   _____                      __       ____       __      __           __\n");
@@ -183,11 +192,11 @@ void searchRelatedWord(Trie* trie){
     printf(" ___/ /  __/ /_/ / /  / /__/ / / /  / _, _/  __/ / /_/ / /_/  __/ /_/ /  \n");
     printf("/____/\\___/\\__,_/_/   \\___/_/ /_/  /_/ |_|\\___/_/\\__,_/\\__/\\___/\\__,_/   \n");
     printf("\n");
-    do{
-        printf("Input a prefix to be searched[no spaces]: ");
+    do {
+        printf("Input a prefix to be searched [no spaces]: ");
         scanf("%s", prefix);
         getchar();
-    }while(!isNoSpaces(prefix));
+    } while (!isNoSpaces(prefix));
     searchRelated(trie, prefix);
 }
 
@@ -207,10 +216,19 @@ void seeAllWord(Data* curr, char *word, int depth) {
     }
 }
 
+void viewAllWords(Trie* trie) {
+    system("cls");
+    printf("Viewing all slang words:\n");
+    char buffer[256];
+    seeAllWord(trie->root, buffer, 0);
+    puts("Enter to continue...");
+    getch();
+}
+
 int main(){
     Trie boogle;
     boogle.root = createData();
-    char input;
+    int input = -1;
 
     do{
         system("cls");
@@ -227,32 +245,37 @@ int main(){
         printf("4. View all slang words\n");
         printf("5. Exit\n");
         printf(">> ");
-        scanf("%c", &input);
+        scanf("%d", &input);
         getchar();
         switch (input){
-        case '1':
+        case 1:
             inputNewSlang(&boogle);
             break;
 
-        case '2':
+        case 2:
             searchSlangWord(&boogle);
             break;
 
-        case '3':
+        case 3:
             searchRelatedWord(&boogle);
             break;
 
-        case '4':
-            seeAllWord(boogle.root, "", 0);
+        case 4:
+            viewAllWords(&boogle);
             break;
         
-        case '5':
+        case 5:
             system("cls");
             printf("Thank you... Have a nice day :)\n");
             break;
+        
+        default:
+        printf("\nInvalid Input\n");
+        break;
+
         }
 
-    }while(input != '5');
+    }while(input != 5);
 
     return 0;
 }
