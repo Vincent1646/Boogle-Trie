@@ -80,12 +80,11 @@ void searcSinglehWord(Trie* trie, char *word){
     }
 }
 
-void printWord(Data* curr, char *word, int depth){
-    int counter = 1;
+void printWord(Data* curr, char *word, int depth, int *counter){
     if(!curr) return;
     if(curr->end){
-        printf("|%d. %s\t\t\t\t|\n", counter,word);
-        counter++;
+        printf("|%d. %s\t\t\t\t|\n", *counter, word);
+        (*counter)++;
     }
     for (int i = 0; i < 52; i++) {
         if (curr->next[i] == NULL) continue;
@@ -94,11 +93,12 @@ void printWord(Data* curr, char *word, int depth){
         } else {
             word[depth] = 'a' + (i - 26);
         }
-        printWord(curr->next[i], word, depth + 1);
+        printWord(curr->next[i], word, depth + 1, counter);
     }
 }
 
 void searchRelated(Trie* trie, char *prefix) {
+    int counter = 1;
     struct Data* curr = trie->root;
     for (int i = 0; i < strlen(prefix); i++) {
         int index = findIndex(prefix[i]);
@@ -116,7 +116,7 @@ void searchRelated(Trie* trie, char *prefix) {
     printf("word started with '%s':\n", prefix);
     char buffer[256];
     strcpy(buffer, prefix);
-    printWord(curr, buffer, strlen(prefix));
+    printWord(curr, buffer, strlen(prefix), &counter);
     puts("Enter to continue...");
     getch();
 }
@@ -184,6 +184,7 @@ void searchSlangWord(Trie* trie){
 }
 
 void searchRelatedWord(Trie* trie) {
+    int counter = 1;
     char prefix[100];
     system("cls");
     printf("   _____                      __       ____       __      __           __\n");
@@ -200,27 +201,30 @@ void searchRelatedWord(Trie* trie) {
     searchRelated(trie, prefix);
 }
 
-void seeAllWord(Data* curr, char *word, int depth) {
+void seeAllWord(Data* curr, char *word, int depth, int *counter) {
     if (!curr) return;
     
     if (curr->end) {
         word[depth] = '\0'; 
-        printf("Slang word: %s\t\t\tDescription: %s\n", word, curr->description);
+        printf("%d. %s\n", *counter, word);
+        (*counter)++;
     }
     
     for (int i = 0; i < 52; i++) {
         if (curr->next[i] != NULL) {
             word[depth] = (i < 26) ? ('A' + i) : ('a' + (i - 26));
-            seeAllWord(curr->next[i], word, depth + 1);
+            seeAllWord(curr->next[i], word, depth + 1, counter);
         }
     }
 }
 
+
 void viewAllWords(Trie* trie) {
+    int counter = 1;
     system("cls");
     printf("List of all slang words in the dictionary:\n");
     char buffer[256];
-    seeAllWord(trie->root, buffer, 0);
+    seeAllWord(trie->root, buffer, 0, &counter);
     puts("Enter to continue...");
     getch();
 }
