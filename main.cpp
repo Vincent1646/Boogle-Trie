@@ -4,8 +4,6 @@
 #include<conio.h>
 #include<windows.h>
 
-int counter = 1;
-
 //Trie Data Structure
 struct Data{
     bool end;
@@ -83,6 +81,7 @@ void searcSinglehWord(Trie* trie, char *word){
 }
 
 void printWord(Data* curr, char *word, int depth){
+    int counter = 1;
     if(!curr) return;
     if(curr->end){
         printf("|%d. %s\t\t\t\t|\n", counter,word);
